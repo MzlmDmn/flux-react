@@ -3,7 +3,7 @@ const dbclient = require('mariasql');
 const db = new dbclient({
     host: 'localhost',
     user: 'root',
-    password: '***REMOVED***',
+    password: 'PASSWORD',
     db: '***REMOVED***'
 });
 
