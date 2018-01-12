@@ -1,0 +1,99 @@
+.App {
+  text-align: left;
+    height: 100%;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+ul{
+  list-style-type: none;
+  padding: 0;
+}
+
+.menu ul{
+  background-color: #222;
+  margin: 0;
+}
+
+.menu li{
+  line-height: 40px;
+  height: 40px;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+nav{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 98px;
+    background: #666;
+}
+
+.main-panel{
+    background: #888;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding-left: 98px;
+}
+
+header{
+    background: #222;
+    color: #f1f1f1;
+    height: 58px;
+    padding: 8px;
+}
+
+aside{
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.chat-box{
+    flex: 1 1 20%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.chat-messages{
+    overflow: auto;
+    position: absolute;
+    bottom: 0;
+    max-height: 100%;
+}
+
+.chat-entry{
+    flex: 1 0 auto;
+    height: 2vh;
+}
