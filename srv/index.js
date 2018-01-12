@@ -52,8 +52,6 @@ io.on('connection', function(socket){
 
 // getChannels();
 
-
-
 // console.log(functions.getChannelByName('mazlumchannel'))
 
 server.listen(8000, function(){
