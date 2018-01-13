@@ -1,6 +1,8 @@
 const server = require('http').Server();
 const io = require('socket.io')(server);
 
+const Channel = require('./Class/Channel.js');
+
 const database = require('./db.js');
 
 io.on('connection', function(socket){
@@ -12,13 +14,28 @@ io.on('connection', function(socket){
     });
 
     socket.on('connect_message', (data) => {
+
+        // Si l'utilisateur est déjà connecté à un Channel, on le quitte
+        let prevChannel = socket.channel;
+        if(socket.channel){ socket.leave(prevChannel); }
+
+        // Et on réattribue socket.channel à la nouvelle route
         socket.channel = data.channel;
 
-        // On récupère les informations de la chaîne et on les envoi au visiteur
+        // On récupère les informations de la chaîne et on les envoi à l'utilisateur
 
         database.getChannelByName(socket.channel).then(function(rows) {
-            console.log(rows);
-            socket.emit('channel_info', rows);
+            if(rows) {
+                // On crée une instance de Channel sur le socket
+                socket.channel_obj = new Channel(rows.id, rows.name, rows.permaname, rows.title, rows.description, rows.image, rows.owner, rows.mods, rows.created_at);
+                console.dir(socket.channel_obj);
+                console.log(socket.channel_obj.getName());
+                // Et on envoi l'objet Channel à l'utilisateur
+                socket.emit('channel_info', socket.channel_obj);
+            } else {
+                // Informer l'utilisateur que le Channel n'existe pas
+                socket.emit('channel_info', { error: 'notfound'});
+            }
         }).catch((err) => setImmediate(() => { throw err; }));
 
         socket.join(socket.channel);
@@ -42,9 +59,6 @@ io.on('connection', function(socket){
 
 // Tous les sockets dans le channel 'to'
 // io.to(data.on).send({username: data.from, message: data.msg});
-
-
-// createChannel('MazlumChannel', 'On s\'amuse!', 'Bienvenue sur cette page exceptionnelle', '/img/uploads/mazlumchannel.png', 'Mazlum');
 
 // updateChannel('3', 'On meurt', 'Bienvenue sur cette page exceptionnelle', '/img/uploads/mazlumchannel.png');
 

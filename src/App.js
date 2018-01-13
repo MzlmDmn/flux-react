@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import $ from 'jquery';
 import logo from './logo.svg';
 import './App.css';
-import Message from './Components/Message';
+import Channel from './Components/Channel';
 
 class App extends Component {
     constructor(){
@@ -21,6 +21,7 @@ class App extends Component {
     }
 
     updateChatInput(e){
+        // On stocke l'input à chaque modification
         this.setState({ chatInput: e.target.value});
     }
 
@@ -28,18 +29,22 @@ class App extends Component {
         if (e.key === 'Enter') {
             this.state.socket.emit('message', { from: this.state.user.username, on: this.props.match.params.channel, msg: this.state.chatInput});
             $('#chat-input').val('');
+            // On envoi le message et on clear l'input
         }
     }
 
+    clearMessageList(){
+        this.setState({ messageList: []})
+    }
+
     componentWillMount(){
-        this.setState({ channel: this.props.match.params.channel});
         this.state.socket.emit('connect_auth', { username: this.state.user.username });
     }
 
     componentDidMount(){
         console.log('componentDidMount started');
 
-        this.state.socket.emit('connect_message', { channel: this.state.channel, message: 'Hello world!'});
+
 
         this.state.socket.on('channel_info', (data) => {
             if(data) {
@@ -65,6 +70,20 @@ class App extends Component {
 
     }
 
+    componentWillUpdate(){
+        console.log('componentWillUpdate');
+    }
+
+    componentDidUpdate(){
+    }
+    componentWillReceiveProps(newProps){
+        /* if(this.state.channel != newProps.params.channel){
+            console.log('Channel changed!');
+            this.setState({ channel : newProps.params.channel });
+            this.state.socket.emit('connect_message', { channel: newProps.params.channel, message: 'Hello world!'});
+        } */
+    }
+
     render() {
         return (
             <div className="App">
@@ -87,44 +106,17 @@ class App extends Component {
                         </li>
                     </ul>
                 </nav>
-                <div className="main-panel container-fluid">
-                    <header>
-                    <div className="row">
-                            <div className="channel-header col-6 no-gutter">
-                                <span className="channel-header-name"><img className="channel-image rounded" src="" />{ this.state.channel_info.name }</span>
-                            </div>
-                            <div className="channel-header col-6 no-gutter">
-                                <span className="channel-header-title">{ this.state.channel_info.title }</span>
-                            </div>
-                    </div>
-                    </header>
-                    <div className="row">
-                        <div className="col-6">
-                            <section>
-                                <div className="embed-flux embed-responsive embed-responsive-16by9">
-                                    <iframe id="player" className="embed-responsive-item" type="text/html"
-                                        src="http://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1"></iframe>
-                                </div>
-                                <br />
-                                { this.state.channel_info.description }
-                            </section>
-                        </div>
-                        <div className="col-6">
-                            <aside>
-                                <div className="chat-box">
-                                    { this.state.messageList.map( (message, index) =>
-                                        <Message    key={index}
-                                                    username={message.username}
-                                                    message={message.message} />
-                                    )}
-                                </div>
-                                <div className="chat-entry form-group">
-                                    <input id="chat-input" type="text" className="form-control" onChange={this.updateChatInput.bind(this)} onKeyPress={this.sendMessage.bind(this)}/>
-                                </div>
-                            </aside>
-                        </div>
-                    </div>
-                </div>
+                <Channel key={this.props.match.params.channel}
+                         channel={this.props.match.params.channel}
+                         socket={this.state.socket}
+                         messageList={this.state.messageList}
+                         name={this.state.channel_info.name}
+                         title={this.state.channel_info.title}
+                         description={this.state.channel_info.description}
+                         sendMessage={this.sendMessage.bind(this)}
+                         updateChatInput={this.updateChatInput.bind(this)}
+                         clearMessageList={this.clearMessageList.bind(this)}
+                />
             </div>
         );
     }
