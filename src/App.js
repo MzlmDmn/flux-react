@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Route, Link } from 'react-router-dom';
+import { Route, Link, Switch } from 'react-router-dom';
 import io from 'socket.io-client';
 import $ from 'jquery';
-import logo from './logo.svg';
 import './App.css';
+import Navbar from './Components/Navbar';
 import Channel from './Components/Channel';
 
 class App extends Component {
@@ -27,7 +27,7 @@ class App extends Component {
 
     sendMessage(e){
         if (e.key === 'Enter') {
-            this.state.socket.emit('message', { from: this.state.user.username, on: this.props.match.params.channel, msg: this.state.chatInput});
+            this.state.socket.emit('message', { from: this.state.user.username, on: this.props.match.params.path, msg: this.state.chatInput});
             $('#chat-input').val('');
             // On envoi le message et on clear l'input
         }
@@ -42,7 +42,7 @@ class App extends Component {
     }
 
     componentDidMount(){
-        console.log('componentDidMount started');
+        console.log('componentDidMount');
 
 
 
@@ -70,53 +70,29 @@ class App extends Component {
 
     }
 
-    componentWillUpdate(){
-        console.log('componentWillUpdate');
-    }
-
-    componentDidUpdate(){
-    }
-    componentWillReceiveProps(newProps){
-        /* if(this.state.channel != newProps.params.channel){
-            console.log('Channel changed!');
-            this.setState({ channel : newProps.params.channel });
-            this.state.socket.emit('connect_message', { channel: newProps.params.channel, message: 'Hello world!'});
-        } */
-    }
-
     render() {
         return (
             <div className="App">
-                <nav className="navbar fixed-left">
-                    <ul>
-                        <li>
-                            <img className="user-image rounded" src="" title="Mon pseudo" /><br />
-                            <span className="user-nickname">{ this.state.username }</span>
-                        </li>
-                    </ul>
-                    <ul>
-                        <li>
-                            <img className="channel-image squared" src="" title="channel-name" />
-                        </li>
-                        <li>
-                            <img className="channel-image squared" src="" title="channel-name" />
-                        </li>
-                        <li>
-                            <img className="channel-image squared" src="" title="channel-name" />
-                        </li>
-                    </ul>
-                </nav>
-                <Channel key={this.props.match.params.channel}
-                         channel={this.props.match.params.channel}
-                         socket={this.state.socket}
-                         messageList={this.state.messageList}
-                         name={this.state.channel_info.name}
-                         title={this.state.channel_info.title}
-                         description={this.state.channel_info.description}
-                         sendMessage={this.sendMessage.bind(this)}
-                         updateChatInput={this.updateChatInput.bind(this)}
-                         clearMessageList={this.clearMessageList.bind(this)}
+                <Navbar
+                    username={this.state.user.username}
                 />
+                <Switch>
+                    <Route path="/:channel" render={props =>
+                        <Channel
+                            key={this.props.match.params.path}
+                            channel={this.props.match.params.path}
+                            socket={this.state.socket}
+                            messageList={this.state.messageList}
+                            name={this.state.channel_info.name}
+                            title={this.state.channel_info.title}
+                            description={this.state.channel_info.description}
+                            sendMessage={this.sendMessage.bind(this)}
+                            updateChatInput={this.updateChatInput.bind(this)}
+                            clearMessageList={this.clearMessageList.bind(this)}
+                        />
+                    } />
+
+                </Switch>
             </div>
         );
     }

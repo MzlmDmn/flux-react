@@ -6,7 +6,7 @@ class Channel extends React.Component {
 
     componentWillMount(){
         console.log('Channel mounted!')
-        this.props.clearMessageList;
+        // this.props.clearMessageList;
     }
     componentDidMount(){
         this.props.socket.emit('connect_message', { channel: this.props.channel, message: 'Hello world!'});
