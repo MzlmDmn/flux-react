@@ -15,8 +15,9 @@ class Navbar extends React.Component {
             <nav className="navbar fixed-left">
                 <ul>
                     <li>
-                        <img className="user-image rounded" src="" alt="" title="Mon pseudo" /><br />
-                        <span className="user-nickname">{ this.props.username }</span>
+                        <img className="user-image rounded" src="" alt="" title="Mon image" /><br />
+                        <span className="user-nickname">{ this.props.username }</span><br />
+                        <Link to={'/chezoirdate'}>Aller chez Oirdate</Link>
                     </li>
                 </ul>
                 <ul>

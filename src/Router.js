@@ -7,6 +7,7 @@ class Router extends React.Component {
     render(){
         return(
             <Switch>
+                <Route path={'/'} component={App} />
                 <Route path={'/mail/:validationkey'} component={Mail} />
                 <Route path={'/:path'} component={App} />
             </Switch>

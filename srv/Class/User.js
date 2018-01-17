@@ -1,15 +1,16 @@
 'use strict';
 
-module.exports = class Channel {
-    constructor(id, name, permaname, title, description, image, owner, mods, created_at){
+module.exports = class User {
+    constructor(id, username, permaname, password, mail, bio, image, history, active, created_at){
         this.id = id;
-        this.name = name;
+        this.username = username;
         this.permaname = permaname;
-        this.title = title;
-        this.description = description;
+        this.password = password;
+        this.mail = mail;
+        this.bio = bio;
         this.image = image;
-        this.owner = owner;
-        this.mods = mods;
+        this.history = history;
+        this.active = active;
         this.created_at = created_at;
     }
 
@@ -21,12 +22,12 @@ module.exports = class Channel {
         return this.id;
     }
 
-    setName(data){
-        return this.name = data;
+    setUsername(data){
+        return this.username = data;
     }
 
-    getName(){
-        return this.name;
+    getUsername(){
+        return this.username;
     }
 
     setPermaname(data){
@@ -37,12 +38,12 @@ module.exports = class Channel {
         return this.permaname;
     }
 
-    setTitle(data){
-        return this.title = data;
+    setMail(data){
+        return this.mail = data;
     }
 
-    getTitle(){
-        return this.title;
+    getMail(){
+        return this.mail;
     }
 
     setDescription(data){
@@ -61,20 +62,12 @@ module.exports = class Channel {
         return this.image;
     }
 
-    setOwner(data){
-        return this.owner = data;
+    setHistory(data){
+        return this.history = data;
     }
 
-    getOwner(){
-        return this.owner;
-    }
-
-    setMods(data){
-        return this.mods = data;
-    }
-
-    getMods(){
-        return this.mods;
+    getHistory(){
+        return this.history;
     }
 
 };
