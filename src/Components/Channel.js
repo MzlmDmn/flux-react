@@ -81,12 +81,12 @@ class Channel extends React.Component {
                                 <Switch>
                                     <Route path="/:channel/edit" render={props =>
                                         <div className="channel-control">
-                                            <button onClick={this.editChannel}><Link to={'/' + this.props.channel }>Sauver</Link></button> <button><Link to={'/' + this.props.channel }>Annuler</Link></button>
+                                            <button className="btn btn-primary" onClick={this.editChannel}><Link to={'/' + this.props.channel }>Sauver</Link></button> <button className="btn btn-primary"><Link to={'/' + this.props.channel }>Annuler</Link></button>
                                         </div>
                                     } />
                                     <Route path="/:channel" render={props =>
                                         <div className="channel-control">
-                                            <button><Link to={'/' + this.props.channel + '/edit'}>Editer</Link></button>
+                                            <button className="btn btn-primary"><Link to={'/' + this.props.channel + '/edit'}>Editer</Link></button>
                                         </div>
                                     } />
                                 </Switch>
@@ -96,7 +96,7 @@ class Channel extends React.Component {
                             <Switch>
                                 <Route path="/:channel/edit" render={props =>
                                     <div>
-                                        <input type="text" id="channel-title" defaultValue={ this.props.title } />
+                                        <input className="form-control" type="text" id="channel-title" defaultValue={ this.props.title } />
                                     </div>
                                 } />
                                 <Route path="/:channel" render={props =>
@@ -118,7 +118,7 @@ class Channel extends React.Component {
                         <Switch>
                             <Route path="/:channel/edit" render={props =>
                                 <div>
-                                    <textarea id="channel-description" defaultValue={ this.props.description }></textarea>
+                                    <textarea className="form-control" rows="16" id="channel-description" defaultValue={ this.props.description }></textarea>
                                 </div>
                             } />
                             <Route path="/:channel" render={props =>

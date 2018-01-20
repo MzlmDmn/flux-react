@@ -1,22 +1,8 @@
 import React from 'react';
 import {  Link } from 'react-router-dom';
-import io from 'socket.io-client';
 import $ from 'jquery';
 
-class Mail extends React.Component {
-    constructor(){
-        super();
-
-        this.state = {
-            socket: io('http://flux.mzlm.be'),
-            error: false
-        };
-    }
-
-    componentWillMount(){
-
-    }
-
+class Home extends React.Component {
     render(){
 
         return(
@@ -37,7 +23,7 @@ class Mail extends React.Component {
                             <div className="col-6">
                                 <div>
                                     <h2>Bienvenue sur Flux, votre salon de discussion</h2>
-                                    <button type="submit" className="btn btn-warning"><Link to={'/login'}>Accéder à l'application</Link></button>
+                                        <button type="submit" className="btn btn-warning"><Link to={'/login'}>Accéder à l'application</Link></button>
                                 </div>
                             </div>
                             <div className="col-3"></div>
@@ -49,7 +35,6 @@ class Mail extends React.Component {
     }
 }
 
-export default Mail;
-
+export default Home;
 
 

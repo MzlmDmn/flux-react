@@ -1,11 +1,13 @@
 const server = require('http').Server();
 const io = require('socket.io')(server);
 const cryptojs = require('crypto-js');
+const sha1 = require('js-sha1');
 
 const Channel = require('./Class/Channel.js');
 const User = require('./Class/User.js');
 
 const database = require('./db.js');
+const functions = require('./functions.js');
 
 io.on('connection', function(socket){
     console.log('A user connected');
@@ -28,7 +30,7 @@ io.on('connection', function(socket){
         socket.channel = data.channel;
 
         // On récupère les informations de la chaîne et on les envoi à l'utilisateur
-
+        console.log(socket.channel);
         database.getChannelByName(socket.channel).then(function(rows) {
             if(rows !== undefined) {
                 // On crée une instance de Channel sur le socket
@@ -50,6 +52,62 @@ io.on('connection', function(socket){
     socket.on('message', (data) =>{
         console.log(data.from + '-' + socket.id + ' #' + data.on + ' : ' + data.msg);
         io.to(socket.channel).send({username: data.from, message: data.msg});
+    });
+
+    socket.on('register_user', (data) => {
+        console.dir(data);
+        if(functions.validateUser(data.username, data.password, data.mail)){
+            // On crée le hashcode pour le mail
+            let hashcode = sha1(data.mail);
+            let user_check = false;
+            let mail_check = false;
+
+            Promise.all([database.getUserByUsername(data.username), database.getUserByMail(data.mail)]).then(function(values) {
+
+                if(values[0] === undefined && values[1] === undefined){
+                    console.log('Username or Mail doesn\'t exist');
+                    setTimeout(()=>{
+                        database.createUser(data.username, data.password, data.mail, hashcode);
+                        functions.sendMail(data.username, data.mail, hashcode);
+                        socket.emit('register_user', { success: true });
+                    }, 3000);
+
+                } else {
+
+                    console.log('Username or Mail does exist');
+                    socket.emit('register_user', { error: true });
+                }
+            });
+
+            /*functions.checkUserExist().then(function(res) {
+                if(res){
+
+                }
+            }).catch((err) => setImmediate(() => { throw err; }));;
+            /*
+            database.getUserByUsername(data.username).then(function(rows) {
+                if(rows !== undefined) {
+                    console.log('Name already exist')
+                } else {
+                    return true;
+                }
+            }).then(() => database.getUserByMail(data.mail).then(function(rows) {
+                if(rows !== undefined) {
+                    // L'utilisateur existe déjà, on ne le crée pas
+                    console.log('Mail already exist')
+                } else {
+                    if(user_check === true){
+                        // L'utilisateur est validé et n'existe pas dans la DB, on le crée
+                        console.log('Ready to query');
+                        // Envoyer un mail avec la clé de vérification
+                        functions.sendMail(data.username, data.mail, hashcode);
+                    }
+                }
+            })
+
+            ).catch((err) => setImmediate(() => { throw err; }));
+            */
+        }
     });
 
     socket.on('edit_channel', (data) =>{
@@ -91,7 +149,7 @@ io.on('connection', function(socket){
 
 // console.log(functions.getChannelByName('mazlumchannel'))
 
-database.getUserByName('MaZluM').then(function(rows){
+database.getUserByUsername('MaZluM').then(function(rows){
     if(rows !== undefined){
         console.dir(rows);
         let bytes = cryptojs.AES.decrypt(rows.password.toString(), 'Ma phrase secrète');
