@@ -9,12 +9,22 @@ class Mail extends React.Component {
 
         this.state = {
             socket: io('http://flux.mzlm.be'),
-            error: false
+            error: true
         };
     }
 
     componentWillMount(){
+        this.state.socket.emit('mail_verification', this.props.match.params.validationkey);
+    }
 
+    componentDidMount(){
+        this.state.socket.on('mail_verification', (data) => {
+            if(data){
+                this.setState({ error: false });
+            } else{
+                this.setState({ error: true });
+            }
+        })
     }
 
     render(){
@@ -36,8 +46,20 @@ class Mail extends React.Component {
                             <div className="col-3"></div>
                             <div className="col-6">
                                 <div>
-                                    <h2>Bienvenue sur Flux, votre salon de discussion</h2>
-                                    <button type="submit" className="btn btn-warning"><Link to={'/login'}>Accéder à l'application</Link></button>
+                                    <h2>Mail de vérification</h2>
+                                    { !this.state.error &&
+                                        <div>
+                                            <p>Merci d'avoir activé votre compte!</p>
+                                            <button type="submit" className="btn btn-primary"><Link to={'/login'}>Se connecter</Link></button><button type="submit" className="btn btn-warning"><Link to={'/login/register'}>S'inscrire</Link></button>
+                                        </div>
+                                    }
+                                    { this.state.error &&
+                                        <div>
+                                            <p>Cet utilisateur n'existe pas ou a déjà été activé.</p>
+                                            <button type="submit" className="btn btn-primary"><Link to={'/login/register'}>S'inscrire</Link></button>
+                                        </div>
+                                    }
+
                                 </div>
                             </div>
                             <div className="col-3"></div>

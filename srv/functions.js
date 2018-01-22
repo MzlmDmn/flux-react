@@ -5,8 +5,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: '###',
-        pass: '###'
+        user: '***REMOVED***',
+        pass: '***REMOVED***'
     }
 });
 
@@ -21,7 +21,7 @@ module.exports = {
             return false;
         }
 
-        // Valider la longueur du mot de passe et que les deux mots de passes sont pareils.
+        // Valider la longueur du mot de passe et que les deux mots de passes sont similaires.
         if(password.length <= 7){
             return false;
         }
@@ -37,10 +37,10 @@ module.exports = {
 
     sendMail(username, mail, hashcode){
         const mailOptions = {
-            from: '***REMOVED***', // sender address
-            to: mail, // list of receivers
-            subject: 'Bienvenue sur Flux App, ' + username, // Subject line
-            html: '<h1>Bienvenue sur Flux App, '+ username +'</h1><p>Veuillez activer votre compte en cliquant sur le lien suivant: <a href="http://localhost:3000/mail/'+ hashcode +'">Lien d\'activation</a></p>'
+            from: '***REMOVED***', // Adresse d'envoi
+            to: mail, // Liste des destinataires
+            subject: 'Bienvenue sur Flux App, ' + username, // Sujet du message
+            html: '<h1>Bienvenue sur Flux App, '+ username +'</h1><p>Veuillez activer votre compte en cliquant sur le lien suivant: <a href="http://localhost:3000/mail/'+ hashcode +'">Lien d\'activation</a></p>' // HTML du message
         };
 
         transporter.sendMail(mailOptions, function (err, info) {
@@ -51,26 +51,59 @@ module.exports = {
         });
     },
 
-    // Vérifier l'existence de l'Username/Mail dans la DB
+    sendUserInfo(socket){
+        let userHistory = socket.user.history;
+        let newHistory = [];
 
-    checkUserExist(username, mail){
+        // Convertir l'historique de l'utilisateur en objet Channels
+         setTimeout(()=>{
+            database.getChannels().then((rows) => {
+                for(let history of userHistory){
+                    for(let channel of rows){
+                        if(history === channel.permaname){
+                            newHistory.push(channel);
+                        }
+                    }
+                }
 
-        return new Promise ((resolve, reject) => {
-
-            Promise.all([database.getUserByUsername(username), database.getUserByMail(mail)]).then(function(values) {
-                console.dir(values);
-                /*
-                if(values[0] === undefined && values[1] === undefined){
-                    console.log('Username or Mail doesn\'t exist');
-                    resolve(true);
-
-                } else {
-                    console.log('Username or Mail does exist');
-                    reject('User or mail exist');
-                }*/
+                socket.emit('user_info', {
+                    username: socket.user.username,
+                    mail: socket.user.mail,
+                    bio: socket.user.bio,
+                    image: socket.user.image,
+                    history: newHistory,
+                    created_at: socket.user.created_at
+                });
             });
-        });
+        }, 3000);
+
+
+    },
+
+    addChannelHistory(socket, channel){
+
+        // Vérifier qu'il n'y a pas de vide dans l'array
+        let temp = [];
+        for(let i of socket.user.history)
+            i && temp.push(i); // copy each non-empty value to the 'temp' array
+
+        socket.user.history = temp;
+
+        let historyIndex = socket.user.history.indexOf(channel);
+
+        // Supprimer le Channel de l'historique si il existe, pour le remettre en haut de la liste
+        if(historyIndex > -1){
+            socket.user.history.splice(historyIndex, 1);
+        }
+        socket.user.history.push(channel);
+
+        setTimeout(()=>{
+            database.updateUserHistory(socket.user.id, socket.user.history);
+        }, 1000);
+        this.sendUserInfo(socket);
     }
+
+
 
 };
 

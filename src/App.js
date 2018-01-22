@@ -8,23 +8,21 @@ import Navbar from './Components/Navbar';
 import Channel from './Components/Channel';
 
 class App extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
             socket: io('http://flux.mzlm.be'),
             user: {
-                username: 'Mazlum'
+                history: []
             },
-            channel_info: {}
+            channel_info: {},
+            channels: []
         };
     }
 
 
-
-
-
     componentWillMount(){
-        this.state.socket.emit('connect_auth', { username: this.state.user.username });
+
     }
 
     componentDidMount(){
@@ -32,15 +30,14 @@ class App extends Component {
         // Réception des informations du Channel, stockage en state
         this.state.socket.on('user_info', (data) => {
             if(data !== undefined) {
-                console.log('user_info : ' + data.permaname);
+                console.log('user_info : ' + data.username);
                 this.setState({
                     user: {
-                        id: data.id,
                         username: data.username,
-                        permaname: data.permaname,
                         mail: data.mail,
                         bio: data.bio,
                         image: data.image,
+                        history: data.history,
                         created_at: data.created_at
                     }
                 });
@@ -49,7 +46,7 @@ class App extends Component {
 
         // Réception des informations du Channel, stockage en state
         this.state.socket.on('channel_info', (data) => {
-            if(data !== undefined) {
+            if(!data.error && data !== undefined) {
                 console.log('channel_info : ' + data.permaname);
                 this.setState({
                     channel_info: {
@@ -63,6 +60,9 @@ class App extends Component {
                         created_at: data.created_at
                     }
                 });
+            } else {
+                // Si la chaîne n'existe pas, push vers /app
+                this.props.history.push('/app');
             }
         });
 
@@ -76,12 +76,14 @@ class App extends Component {
                     <Route path="/login" render={props =>
                         <Login
                             socket={this.state.socket}
+                            history={this.props.history}
                         />
                     } />
                     <Route path="/:channel" render={props =>
                         <div>
                             <Navbar
                                 user={this.state.user}
+                                history={this.props.history}
                             />
                             <Channel
                                 key={this.props.match.params.path}

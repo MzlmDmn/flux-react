@@ -76,7 +76,7 @@ class Channel extends React.Component {
                 <header>
                     <div className="row no-gutter">
                         <div className="channel-header col-6">
-                            <span className="channel-header-name"><img className="channel-image rounded" src={ this.props.image } />{ this.props.name }</span>
+                            <span className="channel-header-name"><img className="channel-image rounded" src="" />{ this.props.name }</span>
                             {this.props.user.username === this.props.owner &&
                                 <Switch>
                                     <Route path="/:channel/edit" render={props =>

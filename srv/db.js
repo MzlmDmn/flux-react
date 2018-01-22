@@ -4,7 +4,7 @@ const cryptojs = require('crypto-js');
 const db = new dbclient({
     host: 'localhost',
     user: 'root',
-    password: '###',
+    password: '***REMOVED***',
     db: '***REMOVED***'
 });
 
@@ -103,7 +103,7 @@ module.exports = {
                 function (err, rows) {
                     if (err)
                         reject(err);
-                    resolve(rows[0]);
+                    resolve(rows);
                 }
             );
 
@@ -120,8 +120,8 @@ module.exports = {
 
         let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        db.query('INSERT INTO pwd_users SET username = :username, permaname = :permaname, password = :password, mail = :mail, bio = :bio, image = :image, active = :active, created_at = :date',
-            { username: username, permaname: username.toLowerCase(), password: encryptedpassword, mail: mail.toLowerCase(), image: '/img/default.png', bio: bio, active: false, date: date },
+        db.query('INSERT INTO pwd_users SET username = :username, permaname = :permaname, password = :password, mail = :mail, bio = :bio, image = :image, history = :history, active = :active, created_at = :date',
+            { username: username, permaname: username.toLowerCase(), password: encryptedpassword, mail: mail.toLowerCase(), image: '/img/default.png', bio: bio, history: '', active: false, date: date },
             function(err, rows) {
                 if (err)
                     throw err;
@@ -147,15 +147,31 @@ module.exports = {
         db.end();
     },
 
+    updateUserHistory : function(id, history){
+        let commatedHistory = history.join(', ');
+
+        console.log(commatedHistory);
+
+        db.query('UPDATE pwd_users SET history = :history WHERE id = :id',
+            {id: id, history: commatedHistory},
+            function (err, rows) {
+                if (err)
+                    throw err;
+                console.dir(rows);
+            });
+
+        db.end();
+    },
+
     activateUser : function(validationkey){
 
         return new Promise ((resolve, reject) => {
             db.query('UPDATE pwd_users SET active = :active, bio = :bio WHERE bio = :validationkey',
-                {id: id, active: true, validationkey: validationkey},
+                {active: 1, bio: '', validationkey: validationkey},
                 function (err, rows) {
                     if (err)
                         return reject(err);
-                    resolve(rows[0]);
+                    resolve(rows);
                 });
 
             db.end();
