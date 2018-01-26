@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = class User {
-    constructor(id, username, permaname, password, mail, bio, image, history, active, created_at){
+    constructor(id, username, permaname, password, mail, bio, image, history, active, role, created_at){
         this.id = id;
         this.username = username;
         this.permaname = permaname;
@@ -11,6 +11,7 @@ module.exports = class User {
         this.image = image;
         this.history = history;
         this.active = active;
+        this.role = role;
         this.created_at = created_at;
     }
 

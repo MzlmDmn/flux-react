@@ -24,19 +24,18 @@ class Navbar extends React.Component {
                         <ul>
                             <li>
                                 <img className="user-image rounded" src="" alt="" title="Mon image" /><br />
-                                <span className="user-nickname">{ this.props.username }</span><br />
-                                <Link to={'/chezoirdate'}>Aller chez Oirdate</Link>
-                                <Link to={'/mazlumchannel'}>Aller chez Mazlum</Link>
+                                <span className="user-nickname">{ this.props.user.username }</span><br />
                             </li>
                         </ul>
-                        <ul>
+                        <ul id="user-history">
                             { this.props.user.history.map( (channel, index) =>
-                                <li>
+                                <li key={index}>
                                     <Link to={'/' + channel.permaname } ><img className="channel-image rounded" src={channel.image} alt={channel.name} title={channel.name} /></Link>
                                 </li>
                             )}
                         </ul>
                     </div>
+                    { this.props.user.role === 'admin' && <div className="admin-link"><Link to={'/admin'} >Admin</Link></div> }
                 </nav>
             )
         }

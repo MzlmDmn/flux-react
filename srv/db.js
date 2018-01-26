@@ -5,7 +5,7 @@ const db = new dbclient({
     host: 'localhost',
     user: 'root',
     password: '###',
-    db: '***REMOVED***'
+    db: '###'
 });
 
 module.exports = {
@@ -26,10 +26,25 @@ module.exports = {
 
         db.end();
     },
-    updateChannel : function(id, title, description, image) {
+    updateChannel : function(id, title, description) {
 
-        db.query('UPDATE pwd_channels SET title = :title, description = :description, image = :image WHERE id = :id',
-            {id: id, title: title, description: description, image: image},
+        db.query('UPDATE pwd_channels SET title = :title, description = :description WHERE id = :id',
+            {id: id, title: title, description: description},
+            function (err, rows) {
+                if (err)
+                    throw err;
+                console.dir(rows);
+            });
+
+        db.end();
+    },
+
+    updateImageChannel : function(id, image) {
+
+        let imageLink = 'http://flux.mzlm.be/uploads/' + image;
+
+        db.query('UPDATE pwd_channels SET image = :image WHERE id = :id',
+            {id: id, image: imageLink},
             function (err, rows) {
                 if (err)
                     throw err;
@@ -41,7 +56,7 @@ module.exports = {
 
     deleteChannelById : function(id){
 
-        db.query('DELETE FROM pwd_channels WHERE id = :id',
+        db.query('UPDATE pwd_channels SET active = 0 WHERE id = :id',
             { id: id },
             function(err){
                 if(err)
@@ -53,8 +68,21 @@ module.exports = {
 
     deleteChannelByName : function(name){
 
-        db.query('DELETE FROM pwd_channels WHERE name = :name',
+        db.query('UPDATE pwd_channels SET active = 0 WHERE name = :name',
             { name: name },
+            function(err){
+                if(err)
+                    throw err;
+                // console.dir(rows);
+            });
+
+        db.end();
+    },
+
+    deleteChannelByOwner : function(owner){
+
+        db.query('UPDATE pwd_channels SET active = 0 WHERE owner = :owner',
+            { owner: owner },
             function(err){
                 if(err)
                     throw err;
@@ -96,10 +124,25 @@ module.exports = {
         });
     },
 
-    getChannels : function(){
+    getAllChannels : function(){
 
         return new Promise ((resolve, reject) => {
             db.query('SELECT * FROM pwd_channels', null,
+                function (err, rows) {
+                    if (err)
+                        reject(err);
+                    resolve(rows);
+                }
+            );
+
+            db.end();
+        });
+    },
+
+    getActiveChannels : function(){
+
+        return new Promise ((resolve, reject) => {
+            db.query('SELECT * FROM pwd_channels WHERE active = true', null,
                 function (err, rows) {
                     if (err)
                         reject(err);
@@ -180,7 +223,7 @@ module.exports = {
 
     deleteUserById : function(id){
 
-        db.query('DELETE FROM pwd_users WHERE id = :id',
+        db.query('UPDATE pwd_users SET active = 0 WHERE id = :id',
             { id: id },
             function(err){
                 if(err)
@@ -192,7 +235,7 @@ module.exports = {
 
     deleteUserByUsername : function(name){
 
-        db.query('DELETE FROM pwd_users WHERE username = :username',
+        db.query('UPDATE pwd_users SET active = 0 WHERE username = :username',
             { username: name },
             function(err){
                 if(err)
@@ -251,14 +294,29 @@ module.exports = {
         });
     },
 
-    getUsers : function(){
+    getAllUsers : function(){
 
         return new Promise ((resolve, reject) => {
             db.query('SELECT * FROM pwd_users', null,
                 function (err, rows) {
                     if (err)
                         reject(err);
-                    resolve(rows[0]);
+                    resolve(rows);
+                }
+            );
+
+            db.end();
+        });
+    },
+
+    getActiveUsers : function(){
+
+        return new Promise ((resolve, reject) => {
+            db.query('SELECT * FROM pwd_users WHERE active = true', null,
+                function (err, rows) {
+                    if (err)
+                        reject(err);
+                    resolve(rows);
                 }
             );
 

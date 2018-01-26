@@ -5,7 +5,9 @@ import $ from 'jquery';
 import './App.css';
 import Login from './Components/Login';
 import Navbar from './Components/Navbar';
+import Main from './Components/Main';
 import Channel from './Components/Channel';
+import Admin from './Components/Admin';
 
 class App extends Component {
     constructor(props){
@@ -32,14 +34,7 @@ class App extends Component {
             if(data !== undefined) {
                 console.log('user_info : ' + data.username);
                 this.setState({
-                    user: {
-                        username: data.username,
-                        mail: data.mail,
-                        bio: data.bio,
-                        image: data.image,
-                        history: data.history,
-                        created_at: data.created_at
-                    }
+                    user: data
                 });
             }
         });
@@ -49,16 +44,7 @@ class App extends Component {
             if(!data.error && data !== undefined) {
                 console.log('channel_info : ' + data.permaname);
                 this.setState({
-                    channel_info: {
-                        id: data.id,
-                        name: data.name,
-                        permaname: data.permaname,
-                        title: data.title,
-                        description: data.description,
-                        image: data.image,
-                        owner: data.owner,
-                        created_at: data.created_at
-                    }
+                    channel_info: data
                 });
             } else {
                 // Si la chaîne n'existe pas, push vers /app
@@ -78,6 +64,30 @@ class App extends Component {
                             socket={this.state.socket}
                             history={this.props.history}
                         />
+                    } />
+                    <Route path="/app" render={props =>
+                        <div>
+                            <Navbar
+                                user={this.state.user}
+                                history={this.props.history}
+                            />
+                            <Main
+                                socket={this.state.socket}
+                                history={this.props.history}
+                                username={this.state.user.username}
+                            />
+                        </div>
+                    } />
+                    <Route path="/admin" render={props =>
+                        <div>
+                            <Navbar
+                                user={this.state.user}
+                                history={this.props.history}
+                            />
+                            <Admin
+                                socket={this.state.socket}
+                            />
+                        </div>
                     } />
                     <Route path="/:channel" render={props =>
                         <div>

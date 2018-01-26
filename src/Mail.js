@@ -1,7 +1,6 @@
 import React from 'react';
 import {  Link } from 'react-router-dom';
 import io from 'socket.io-client';
-import $ from 'jquery';
 
 class Mail extends React.Component {
     constructor(){

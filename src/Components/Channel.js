@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Route, Link } from 'react-router-dom';
 import $ from 'jquery';
+import SocketIOFileClient from 'socket.io-file-client';
 import Message from './Message';
 
 class Channel extends React.Component {
@@ -14,8 +15,8 @@ class Channel extends React.Component {
 
         this.updateChatInput = this.updateChatInput.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
-
         this.editChannel = this.editChannel.bind(this);
+        this.uploadImage = this.uploadImage.bind(this);
     };
 
     // EDIT CHANNEL
@@ -29,8 +30,17 @@ class Channel extends React.Component {
                 description: $('#channel-description').val(),
                 image: '/img/default.png'
             });
-            this.forceUpdate();
+            if ($('#channel-image-input').get(0).files.length !== 0) {
+                this.uploadImage();
+            }
         }
+    }
+
+    uploadImage(){
+        const file = $("#channel-image-input")[0];
+        const upload = this.state.uploader.upload(file, {
+            data: { /* Arbitrary data... */ }
+        });
     }
 
     // CHATBOX
@@ -59,13 +69,21 @@ class Channel extends React.Component {
 
     componentWillMount(){
         console.log('Channel mounted!')
-        // this.props.clearMessageList;
+
+        const uploader = new SocketIOFileClient(this.props.socket);
+        this.setState({ uploader: uploader});
     }
     componentDidMount(){
+
         this.props.socket.emit('connect_message', { channel: this.props.channel, message: 'Hello world!'});
 
         this.props.socket.on('message', (data) => {
             this.setState(prevState => ({ messageList : [...prevState.messageList, { username: data.username, message: data.message}]}));
+        });
+
+        // Ecouter si une image a été uploadée
+        this.state.uploader.on('complete', (fileInfo) => {
+            this.forceUpdate();
         });
     }
 
@@ -76,7 +94,14 @@ class Channel extends React.Component {
                 <header>
                     <div className="row no-gutter">
                         <div className="channel-header col-6">
-                            <span className="channel-header-name"><img className="channel-image rounded" src={ this.props.image } />{ this.props.name }</span>
+                            <Switch>
+                                <Route path="/:channel/edit" render={props =>
+                                    <span className="channel-header-name"><img className="channel-image rounded" src={ this.props.image } /><input className="form-control image-submit" type="file" id="channel-image-input" /></span>
+                                } />
+                                <Route path="/:channel" render={props =>
+                                    <span className="channel-header-name"><img className="channel-image rounded" src={ this.props.image } />{ this.props.name }</span>
+                                } />
+                            </Switch>
                             {this.props.user.username === this.props.owner &&
                                 <Switch>
                                     <Route path="/:channel/edit" render={props =>

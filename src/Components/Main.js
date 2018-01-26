@@ -3,69 +3,68 @@ import { Switch, Route, Link } from 'react-router-dom';
 import $ from 'jquery';
 import Message from './Message';
 
-class Channel extends React.Component {
-    constructor(){
-        super();
+class Main extends React.Component {
+    constructor(props){
+        super(props);
 
         this.state = {
-            chatInput: '',
-            messageList: []
+            channels: [],
+            my_channels: [],
+            channelNameInput: '',
+            error: false
         };
 
-        this.updateChatInput = this.updateChatInput.bind(this);
-        this.sendMessage = this.sendMessage.bind(this);
-
-        this.editChannel = this.editChannel.bind(this);
+        this.updateInput = this.updateInput.bind(this);
+        this.createChannel = this.createChannel.bind(this);
+        this.deleteChannel = this.deleteChannel.bind(this);
     };
 
-    // EDIT CHANNEL
-
-    editChannel(){
-        console.log('Update channel!');
-        if($('#channel-title').val() !== '' && $('#channel-description') !== ''){
-            // On vérifie que les champs sont complétés et on emit la requête
-            this.props.socket.emit('edit_channel', {
-                title: $('#channel-title').val(),
-                description: $('#channel-description').val(),
-                image: '/img/default.png'
-            });
-            this.forceUpdate();
-        }
-    }
-
-    // CHATBOX
-
-    updateChatInput(e){
+    updateInput(e){
         // On stocke l'input à chaque modification
-        this.setState({ chatInput: e.target.value});
+        this.setState({ channelNameInput: e.target.value});
     }
 
-    sendMessage(e){
-        // On vérifie que la touche Enter a été appuyée et que le chatInput ne soit pas vide
-        if (e.key === 'Enter' && this.state.chatInput !== '') {
-            this.props.socket.emit('message', this.state.chatInput);
-            $(".chat-box").animate({ scrollTop: $(".chat-box")[0].scrollHeight}, 1000);
-            this.setState({ chatInput: '' });
-            $('#chat-input').val('');
-            // On envoi le message, scroll la chatbox et on clear l'input
+    createChannel(){
+        // On vérifie que l'utilisateur a rentré un nom pour le salon
+        if (this.state.channelNameInput !== '') {
+            this.props.socket.emit('create_channel', this.state.channelNameInput);
+            this.props.socket.emit('get_channels');
+            this.setState({ channelNameInput: '' });
+            $('#channel-name-input').val('');
         }
     }
 
-    clearMessageList(){
-        this.setState({ messageList: []})
+    deleteChannel(id){
+        if(id){
+            this.props.socket.emit('delete_channel', id);
+            this.props.socket.emit('get_channels');
+        }
     }
 
     // COMPONENT CYCLE
 
     componentWillMount(){
-        console.log('Channel mounted!')
-        // this.props.clearMessageList;
+        this.props.socket.emit('get_channels');
     }
     componentDidMount(){
-        this.props.socket.emit('connect_message', { channel: this.props.channel, message: 'Hello world!'});
+        this.props.socket.on('get_channels', (data) =>{
+            this.setState({ channels: data, my_channels: []});
+            for(let channel of data){
+                if(channel.owner === this.props.username){
+                    this.setState(prevState => ({ my_channels : [...prevState.my_channels, channel]}))
+                }
+            }
+            if(this.props.username === undefined){ this.props.socket.emit('get_channels'); }
+        });
 
-        this.props.socket.on('message', (data) => {
-            this.setState(prevState => ({ messageList : [...prevState.messageList, { username: data.username, message: data.message}]}));
+        this.props.socket.on('create_channel', (data) => {
+            if(data){
+                setTimeout(() => { this.props.history.push('/' + data); }, 1000);
+            } else{
+                this.setState({
+                    error: true
+                })
+            }
         });
     }
 
@@ -76,76 +75,49 @@ class Channel extends React.Component {
                 <header>
                     <div className="row no-gutter">
                         <div className="channel-header col-6">
-                            <span className="channel-header-name"><img className="channel-image rounded" src="" />{ this.props.name }</span>
-                            {this.props.user.username === this.props.owner &&
-                                <Switch>
-                                    <Route path="/:channel/edit" render={props =>
-                                        <div className="channel-control">
-                                            <button className="btn btn-primary" onClick={this.editChannel}><Link to={'/' + this.props.channel }>Sauver</Link></button> <button className="btn btn-primary"><Link to={'/' + this.props.channel }>Annuler</Link></button>
-                                        </div>
-                                    } />
-                                    <Route path="/:channel" render={props =>
-                                        <div className="channel-control">
-                                            <button className="btn btn-primary"><Link to={'/' + this.props.channel + '/edit'}>Editer</Link></button>
-                                        </div>
-                                    } />
-                                </Switch>
-                            }
+                            Toutes les chaînes
                         </div>
                         <div className="channel-header col-6">
-                            <Switch>
-                                <Route path="/:channel/edit" render={props =>
-                                    <div>
-                                        <input className="form-control" type="text" id="channel-title" defaultValue={ this.props.title } />
-                                    </div>
-                                } />
-                                <Route path="/:channel" render={props =>
-                                    <div>
-                                        <span className="channel-header-title">{ this.props.title }</span>
-                                    </div>
-                                } />
-                            </Switch>
+                            Mes chaînes
                         </div>
                     </div>
                 </header>
                 <div className="row no-gutter">
                     <section className="col-6">
-                        <div className="embed-flux embed-responsive embed-responsive-16by9">
-                            <iframe id="player" className="embed-responsive-item" type="text/html"
-                                    src="http://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1"></iframe>
-                        </div>
-                        <br />
-                        <Switch>
-                            <Route path="/:channel/edit" render={props =>
-                                <div>
-                                    <textarea className="form-control" rows="16" id="channel-description" defaultValue={ this.props.description }></textarea>
-                                </div>
-                            } />
-                            <Route path="/:channel" render={props =>
-                                <div>
-                                    <p className="channel-description">{ this.props.description }</p>
-                                </div>
-                            } />
-                        </Switch>
+                        <table className="table">
+                            <tbody>
+                                { this.state.channels.map( (channel, index) =>
+                                    <tr key={index}>
+                                        <th scope="row"><img className="channel-image rounded" src={ channel.image } /></th>
+                                        <td><span className="channel-header-name">{ channel.name }</span><br />{ channel.title }</td>
+                                        <td><button className="btn btn-primary"><Link to={'/' + channel.permaname } >Rejoindre</Link></button></td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </section>
                     <aside className="col-6">
-                        <div className="chat-box">
-                            { this.state.messageList.map( (message, index) =>
-                                <Message    key={index}
-                                            username={message.username}
-                                            message={message.message} />
+                        <input id="channel-name-input" type="text" className="form-control" onChange={this.updateInput} />
+                        <button className="btn btn-primary" onClick={this.createChannel}>Créer un salon</button>{ this.state.error && <span> - Vérifiez les caractères que vous avez entrés.</span> }
+                        <table className="table">
+                            <tbody>
+                            { this.state.my_channels.map( (channel, index) =>
+                                <tr key={index}>
+                                    <th scope="row"><img className="channel-image rounded" src={ channel.image } /></th>
+                                    <td><span className="channel-header-name">{ channel.name }</span><br />{ channel.title }</td>
+                                    <td><button className="btn btn-primary"><Link to={'/' + channel.permaname } >Rejoindre</Link></button><button className="btn btn-danger" onClick={()=>{ this.deleteChannel(channel.id); }}>Supprimer</button></td>
+                                </tr>
                             )}
-                        </div>
-                        <div className="chat-entry form-group">
-                            <input id="chat-input" type="text" className="form-control" onChange={this.updateChatInput} onKeyPress={this.sendMessage}/>
-                        </div>
+                            </tbody>
+                        </table>
                     </aside>
+
                 </div>
             </div>
         )
     }
 }
 
-export default Channel;
+export default Main;
 
 

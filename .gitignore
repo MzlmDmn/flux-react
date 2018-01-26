@@ -3,12 +3,15 @@
 # dependencies
 /node_modules
 
+# security
+passwords.txt
 
 /.idea
 # testing
 /coverage
 
 # production
+/srv/uploads
 /build
 
 # misc

@@ -37,7 +37,7 @@ module.exports = {
 
     sendMail(username, mail, hashcode){
         const mailOptions = {
-            from: '***REMOVED***', // Adresse d'envoi
+            from: '###', // Adresse d'envoi
             to: mail, // Liste des destinataires
             subject: 'Bienvenue sur Flux App, ' + username, // Sujet du message
             html: '<h1>Bienvenue sur Flux App, '+ username +'</h1><p>Veuillez activer votre compte en cliquant sur le lien suivant: <a href="http://localhost:3000/mail/'+ hashcode +'">Lien d\'activation</a></p>' // HTML du message
@@ -57,7 +57,7 @@ module.exports = {
 
         // Convertir l'historique de l'utilisateur en objet Channels
          setTimeout(()=>{
-            database.getChannels().then((rows) => {
+            database.getActiveChannels().then((rows) => {
                 for(let history of userHistory){
                     for(let channel of rows){
                         if(history === channel.permaname){
@@ -71,11 +71,12 @@ module.exports = {
                     mail: socket.user.mail,
                     bio: socket.user.bio,
                     image: socket.user.image,
-                    history: newHistory,
+                    history: newHistory.reverse(),
+                    role: socket.user.role,
                     created_at: socket.user.created_at
                 });
             });
-        }, 3000);
+        }, 2000);
 
 
     },
