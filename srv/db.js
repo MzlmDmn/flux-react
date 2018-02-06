@@ -4,8 +4,8 @@ const cryptojs = require('crypto-js');
 const db = new dbclient({
     host: 'localhost',
     user: 'root',
-    password: '***REMOVED***',
-    db: '***REMOVED***'
+    password: '###',
+    db: '###'
 });
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
 
     updateImageChannel : function(id, image) {
 
-        let imageLink = 'http://flux.mzlm.be/uploads/' + image;
+        let imageLink = 'https://flux.mzlm.be/uploads/' + image;
 
         db.query('UPDATE pwd_channels SET image = :image WHERE id = :id',
             {id: id, image: imageLink},

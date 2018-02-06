@@ -13,7 +13,7 @@ class Player extends React.Component {
         return(
             <div className="embed-flux embed-responsive embed-responsive-16by9">
                 <iframe id="player" className="embed-responsive-item" type="text/html"
-                        src={'https://www.youtube.com/embed/' + this.props.video_id + '?enablejsapi=1&autoplay=0'} ></iframe>
+                        src={'https://www.youtube.com/embed/' + this.props.video_id + '?enablejsapi=1&autoplay=1'} ></iframe>
             </div>
         )
     }
