@@ -108,16 +108,16 @@ class Login extends React.Component {
                 <div className="main-panel container-fluid">
                     <header>
                         <div className="row no-gutter">
-                            <div className="col-3"></div>
+                            <div className="col-3"> </div>
                             <div className="col-6">
                                 <h1>Flux</h1>
                             </div>
-                            <div className="col-3"></div>
+                            <div className="col-3"> </div>
                         </div>
                     </header>
                     <div className="row no-gutter">
                         <section>
-                            <div className="col-3"></div>
+                            <div className="col-3"> </div>
                             <div className="col-6">
                                 <Switch>
                                     <Route path="/login/register" render={props =>
@@ -169,7 +169,7 @@ class Login extends React.Component {
                                     } />
                                 </Switch>
                             </div>
-                            <div className="col-3"></div>
+                            <div className="col-3"> </div>
                         </section>
                     </div>
                 </div>

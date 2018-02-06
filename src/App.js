@@ -13,7 +13,7 @@ class App extends Component {
     constructor(props){
         super(props);
         this.state = {
-            socket: io('http://flux.mzlm.be'),
+            socket: io('https://flux.mzlm.be'),
             user: {
                 history: []
             },

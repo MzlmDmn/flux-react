@@ -1,5 +1,5 @@
 {
-  "name": "untitled1",
+  "name": "FluxApp",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,7 +9,8 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "socket.io-client": "^2.0.4",
-    "socket.io-file-client": "^2.0.2"
+    "socket.io-file-client": "^2.0.2",
+    "youtube-search": "^1.0.10"
   },
   "scripts": {
     "start": "react-scripts start",

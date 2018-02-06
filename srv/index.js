@@ -20,6 +20,8 @@ const functions = require('./functions.js');
 
 app.use('/', express.static('public'));
 
+let channels = [];
+
 io.on('connection', function(socket){
     console.log('A user connected');
 
@@ -114,6 +116,11 @@ io.on('connection', function(socket){
                     socket.emit('channel_info', socket.channel_obj);
                     // On rejoint le Channel
                     socket.join(socket.channel);
+                    // Envoyer la dernière vidéo si elle existe
+                    let channelIndex = channels.map((e)=>{ return e.name; }).indexOf(socket.channel);
+                    if(channelIndex > -1){
+                        socket.emit('video_update', channels[channelIndex].id);
+                    }
                     // On ajoute le Channel à l'historique:
                     functions.addChannelHistory(socket, socket.channel);
 
@@ -131,6 +138,22 @@ io.on('connection', function(socket){
         if(socket.user !== undefined) {
             console.log(socket.user.permaname + '-' + socket.id + ' : ' + message);
             io.to(socket.channel).send({username: socket.user.username, message: message});
+        }
+    });
+
+    // Mettre à jour la vidéo
+    socket.on('video_update', (data) =>{
+        if(socket.user !== undefined && socket.channel) {
+            console.log('Video updated on ' + socket.channel + ' - id: ' + data);
+
+            let channelIndex = channels.map((e)=>{ return e.name; }).indexOf(socket.channel);
+            // Supprimer la vidéo précédente
+            if(channelIndex > -1){
+                channels.splice(channelIndex, 1);
+            }
+            channels.push({ name: socket.channel, id: data});
+
+            io.to(socket.channel).emit('video_update', data);
         }
     });
 

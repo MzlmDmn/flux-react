@@ -197,6 +197,11 @@ section{
     padding: 10px;
 }
 
+.modal{
+    background-color: rgba(0, 0, 0, 0.6);
+    display: block!important;
+}
+
 /* Colonne droite (aside) et Chat */
 
 aside{
@@ -255,4 +260,21 @@ aside{
 .row.no-gutter > [class*=" col-"] {
     padding-right: 0;
     padding-left: 0;
+}
+
+/* Search */
+
+.card{
+    float: left;
+    margin: 5px;
+    width: 15.3rem;
+    min-height: 350px;
+}
+
+.card:hover{
+    transform: scale(1.04, 1.04);
+}
+
+.last-card{
+    margin-right: 0;
 }

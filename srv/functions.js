@@ -5,8 +5,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: '###',
-        pass: '###'
+        user: '***REMOVED***',
+        pass: '***REMOVED***'
     }
 });
 
@@ -37,7 +37,7 @@ module.exports = {
 
     sendMail(username, mail, hashcode){
         const mailOptions = {
-            from: '###', // Adresse d'envoi
+            from: '***REMOVED***', // Adresse d'envoi
             to: mail, // Liste des destinataires
             subject: 'Bienvenue sur Flux App, ' + username, // Sujet du message
             html: '<h1>Bienvenue sur Flux App, '+ username +'</h1><p>Veuillez activer votre compte en cliquant sur le lien suivant: <a href="http://localhost:3000/mail/'+ hashcode +'">Lien d\'activation</a></p>' // HTML du message
@@ -86,7 +86,7 @@ module.exports = {
         // Vérifier qu'il n'y a pas de vide dans l'array
         let temp = [];
         for(let i of socket.user.history)
-            i && temp.push(i); // copy each non-empty value to the 'temp' array
+            i && temp.push(i); // Copier les champs remplis dans un tableau "temp"
 
         socket.user.history = temp;
 

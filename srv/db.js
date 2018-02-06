@@ -4,8 +4,8 @@ const cryptojs = require('crypto-js');
 const db = new dbclient({
     host: 'localhost',
     user: 'root',
-    password: '###',
-    db: '###'
+    password: '***REMOVED***',
+    db: '***REMOVED***'
 });
 
 module.exports = {

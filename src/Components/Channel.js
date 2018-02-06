@@ -2,6 +2,8 @@ import React from 'react';
 import { Switch, Route, Link } from 'react-router-dom';
 import $ from 'jquery';
 import SocketIOFileClient from 'socket.io-file-client';
+import Player from './Player';
+import Search from './Search';
 import Message from './Message';
 
 class Channel extends React.Component {
@@ -10,13 +12,18 @@ class Channel extends React.Component {
 
         this.state = {
             chatInput: '',
-            messageList: []
+            messageList: [],
+            video_id: 'M7lc1UVf-VE',
+            showSearch: false
         };
 
         this.updateChatInput = this.updateChatInput.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.editChannel = this.editChannel.bind(this);
         this.uploadImage = this.uploadImage.bind(this);
+        this.showSearch = this.showSearch.bind(this);
+        this.hideSearch = this.hideSearch.bind(this);
+        this.requestVideoUpdate = this.requestVideoUpdate.bind(this);
     };
 
     // EDIT CHANNEL
@@ -65,6 +72,21 @@ class Channel extends React.Component {
         this.setState({ messageList: []})
     }
 
+    // SEARCH BOX
+
+    showSearch(){
+        this.setState({ showSearch : true })
+    }
+
+    hideSearch(){
+        this.setState({ showSearch : false })
+    }
+
+    requestVideoUpdate(id){
+        this.props.socket.emit('video_update', id);
+        this.hideSearch();
+    }
+
     // COMPONENT CYCLE
 
     componentWillMount(){
@@ -79,6 +101,11 @@ class Channel extends React.Component {
 
         this.props.socket.on('message', (data) => {
             this.setState(prevState => ({ messageList : [...prevState.messageList, { username: data.username, message: data.message}]}));
+        });
+
+        this.props.socket.on('video_update', (data) => {
+            console.log(data);
+            this.setState({ video_id: data});
         });
 
         // Ecouter si une image a été uploadée
@@ -135,19 +162,20 @@ class Channel extends React.Component {
                 </header>
                 <div className="row no-gutter">
                     <section className="col-6">
-                        <div className="embed-flux embed-responsive embed-responsive-16by9">
-                            <iframe id="player" className="embed-responsive-item" type="text/html"
-                                    src="http://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1"></iframe>
-                        </div>
+                        <Player video_id={this.state.video_id} />
                         <br />
                         <Switch>
                             <Route path="/:channel/edit" render={props =>
                                 <div>
-                                    <textarea className="form-control" rows="16" id="channel-description" defaultValue={ this.props.description }></textarea>
+                                    <textarea className="form-control" rows="16" id="channel-description" defaultValue={ this.props.description } />
                                 </div>
                             } />
                             <Route path="/:channel" render={props =>
                                 <div>
+                                    <button type="button" className="btn btn-warning float-right" onClick={this.showSearch}>
+                                        Changer la vidéo
+                                    </button>
+                                    { this.state.showSearch ? <Search requestVideoUpdate={this.requestVideoUpdate} hideSearch={this.hideSearch} /> : null }
                                     <p className="channel-description">{ this.props.description }</p>
                                 </div>
                             } />

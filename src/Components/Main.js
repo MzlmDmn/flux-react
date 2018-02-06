@@ -79,6 +79,9 @@ class Main extends React.Component {
                         </div>
                         <div className="channel-header col-6">
                             Mes chaînes
+                            <button type="button" className="btn btn-warning float-right" onClick={()=>{ this.props.history.push('/');}}>
+                                Se déconnecter
+                            </button>
                         </div>
                     </div>
                 </header>

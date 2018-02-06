@@ -12,7 +12,9 @@ class Navbar extends React.Component {
     }
 
     componentDidMount(){
-
+        setTimeout(()=>{
+            if (this.props.user.username === undefined) this.props.history.push('/');
+        }, 2000)
     }
 
     render(){

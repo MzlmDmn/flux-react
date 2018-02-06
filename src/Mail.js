@@ -7,7 +7,7 @@ class Mail extends React.Component {
         super();
 
         this.state = {
-            socket: io('http://flux.mzlm.be'),
+            socket: io('https://flux.mzlm.be'),
             error: true
         };
     }
